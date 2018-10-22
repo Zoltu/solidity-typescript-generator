@@ -1,0 +1,24 @@
+{
+  "name": "solidity-typescript-generator",
+  "version": "1.0.0",
+  "description": "Takes in a solidity file and generatese a set of TypeScript classes for interacting with the contract.",
+  "main": "output/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "cd ../tests && npm run test",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zoltu/solidity-typescript-generator.git"
+  },
+  "author": "",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/Zoltu/solidity-typescript-generator/issues"
+  },
+  "homepage": "https://github.com/Zoltu/solidity-typescript-generator#readme",
+  "devDependencies": {
+    "typescript": "3.1.3"
+  }
+}

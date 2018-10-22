@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es2015",
+		"noImplicitAny": true,
+		"allowJs": false,
+		"strict": true,
+		"alwaysStrict": true,
+		"declaration": true,
+		"inlineSourceMap": true,
+		"inlineSources": true,
+		"lib": [ "es2018", ],
+		"rootDir": "source",
+		"outDir": "output",
+	}
+}
