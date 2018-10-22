@@ -1,0 +1,1 @@
+Function banana.cherry has multiple return values but not all are named.

@@ -143,7 +143,7 @@ export class Contract<TBigNumber> {
 		return this.dependencies.decodeParams(abi.outputs, result)
 	}
 
-	protected async remoteCall(abi: AbiFunction, parameters: Array<any>, txName: String, sender?: string, attachedEth?: TBigNumber): Promise<void> {
+	protected async remoteCall(abi: AbiFunction, parameters: Array<any>, txName: string, sender?: string, attachedEth?: TBigNumber): Promise<void> {
 		const from = sender || await this.dependencies.getDefaultAddress()
 		const data = this.encodeMethod(abi, parameters)
 		const transaction = Object.assign({ from: from, to: this.address, data: data }, attachedEth ? { value: attachedEth } : {})
@@ -158,8 +158,8 @@ ${contractInterfaces.join('\n')}
 `
 }
 
-function contractInterfaceTemplate(contractName: String, contractAbi: Abi) {
-	const contractMethods: Array<String> = []
+function contractInterfaceTemplate(contractName: string, contractAbi: Abi) {
+	const contractMethods: Array<string> = []
 
 	// FIXME: Add support for Solidity function overloads.  Right now overloaded functions are not supported, only the first one seen will servive addition into the following set.
 	const seen: Set<string> = new Set()
@@ -173,7 +173,7 @@ function contractInterfaceTemplate(contractName: String, contractAbi: Abi) {
 		if (!abiFunction.constant) {
 			contractMethods.push(remoteMethodTemplate(abiFunction))
 		}
-		contractMethods.push(localMethodTemplate(abiFunction))
+		contractMethods.push(localMethodTemplate(abiFunction, { contractName: contractName}))
 		seen.add(abiFunction.name)
 	}
 
@@ -189,9 +189,9 @@ ${contractMethods.join('\n\n')}
 }
 
 function remoteMethodTemplate(abiFunction: AbiFunction) {
-	const argNames: String = toArgNameString(abiFunction)
-	const params: String = toParamsString(abiFunction)
-	const options: String = `{ sender?: string${abiFunction.payable ? ', attachedEth?: TBigNumber' : ''} }`
+	const argNames: string = toArgNameString(abiFunction)
+	const params: string = toParamsString(abiFunction)
+	const options: string = `{ sender?: string${abiFunction.payable ? ', attachedEth?: TBigNumber' : ''} }`
 	return `	public ${abiFunction.name} = async(${params}options?: ${options}): Promise<void> => {
 		options = options || {}
 		const abi: AbiFunction = ${JSON.stringify(abiFunction)}
@@ -200,13 +200,13 @@ function remoteMethodTemplate(abiFunction: AbiFunction) {
 	}`
 }
 
-function localMethodTemplate(abiFunction: AbiFunction) {
-	const argNames: String = toArgNameString(abiFunction)
-	const params: String = toParamsString(abiFunction)
-	const options: String = `{ sender?: string${abiFunction.payable ? ', attachedEth?: TBigNumber' : ''} }`
-	const returnType: String = toTsReturnTypeString(abiFunction.outputs)
-	const returnPromiseType: String = returnType
-	const returnValue: String = (abiFunction.outputs.length === 1)
+function localMethodTemplate(abiFunction: AbiFunction, errorContext: { contractName: string }) {
+	const argNames: string = toArgNameString(abiFunction)
+	const params: string = toParamsString(abiFunction)
+	const options: string = `{ sender?: string${abiFunction.payable ? ', attachedEth?: TBigNumber' : ''} }`
+	const returnType: string = toTsReturnTypeString(abiFunction.outputs, { contractName: errorContext.contractName, functionName: abiFunction.name })
+	const returnPromiseType: string = returnType
+	const returnValue: string = (abiFunction.outputs.length === 1)
 		? `<${returnType}>result[0]`
 		: `<${returnType}>result`
 	return `	public ${abiFunction.name}_ = async(${params}options?: ${options}): Promise<${returnPromiseType}> => {
@@ -216,10 +216,10 @@ function localMethodTemplate(abiFunction: AbiFunction) {
 	}`
 }
 
-function toTsReturnTypeString(abiParameters: AbiParameter[]): string {
+function toTsReturnTypeString(abiParameters: AbiParameter[], errorContext: { contractName: string, functionName: string }): string {
 	if (abiParameters.length === 0) return `void`
 	else if (abiParameters.length === 1) return toTsTypeString(abiParameters[0])
-	else if (!abiParameters.every(abiParameter => !!abiParameter.name)) throw new Error(`Functions with multiple return values must name them all.`)
+	else if (!abiParameters.every(abiParameter => !!abiParameter.name)) throw new Error(`Function ${errorContext.contractName}.${errorContext.functionName} has multiple return values but not all are named.`)
 	else return `{${abiParameters.map(abiParameter => `${abiParameter.name}: ${toTsTypeString(abiParameter)}`).join(', ')}}`
 }
 

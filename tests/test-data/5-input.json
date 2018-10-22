@@ -1,0 +1,19 @@
+{
+	"contracts": {
+		"apple": {
+			"banana": {
+				"abi": [
+					{
+						"name": "cherry",
+						"type": "function",
+						"constant": false,
+						"payable": true,
+						"stateMutability": "payable",
+						"inputs": [ ],
+						"outputs": [ { "name": "", "type": "bool" }, { "name": "", "type": "bool" } ]
+					}
+				]
+			}
+		}
+	}
+}

@@ -98,7 +98,7 @@ export class Contract<TBigNumber> {
 		return this.dependencies.decodeParams(abi.outputs, result)
 	}
 
-	protected async remoteCall(abi: AbiFunction, parameters: Array<any>, txName: String, sender?: string, attachedEth?: TBigNumber): Promise<void> {
+	protected async remoteCall(abi: AbiFunction, parameters: Array<any>, txName: string, sender?: string, attachedEth?: TBigNumber): Promise<void> {
 		const from = sender || await this.dependencies.getDefaultAddress()
 		const data = this.encodeMethod(abi, parameters)
 		const transaction = Object.assign({ from: from, to: this.address, data: data }, attachedEth ? { value: attachedEth } : {})
