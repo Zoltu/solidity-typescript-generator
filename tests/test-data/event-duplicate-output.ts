@@ -52,7 +52,7 @@ export interface EventDescription {
 }
 
 export const eventDescriptions: { [signatureHash: string]: EventDescription } = {
-	
+	'0xfbdb8fdfd32e84835a750769f56aef848a42071cd44b719c3add9f069250f83b': {"name":"durian","signature":"durian()","signatureHash":"0xfbdb8fdfd32e84835a750769f56aef848a42071cd44b719c3add9f069250f83b","parameters":[]}
 }
 
 
@@ -168,22 +168,21 @@ export class Contract<TBigNumber> {
 }
 
 
-export class banana<TBigNumber> extends Contract<TBigNumber> {
+export class Banana<TBigNumber> extends Contract<TBigNumber> {
 	public constructor(dependencies: Dependencies<TBigNumber>, address: string) {
 		super(dependencies, address)
 	}
 
-	public cherry = async(durian: TBigNumber, options?: { sender?: string, attachedEth?: TBigNumber }): Promise<Array<Event>> => {
+	public cherry = async(options?: { sender?: string, attachedEth?: TBigNumber }): Promise<Array<Event>> => {
 		options = options || {}
-		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[{"name":"durian","type":"uint256"}],"outputs":[{"name":"eggplant","type":"bool"}]}
-		return await this.remoteCall(abi, [durian], 'cherry', options.sender, options.attachedEth)
+		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[],"outputs":[]}
+		return await this.remoteCall(abi, [], 'cherry', options.sender, options.attachedEth)
 	}
 
-	public cherry_ = async(durian: TBigNumber, options?: { sender?: string, attachedEth?: TBigNumber }): Promise<boolean> => {
+	public cherry_ = async(options?: { sender?: string, attachedEth?: TBigNumber }): Promise<void> => {
 		options = options || {}
-		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[{"name":"durian","type":"uint256"}],"outputs":[{"name":"eggplant","type":"bool"}]}
-		const result = await this.localCall(abi, [durian], options.sender, options.attachedEth)
-		return <boolean>result[0]
+		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[],"outputs":[]}
+		await this.localCall(abi, [], options.sender, options.attachedEth)
 	}
 }
 

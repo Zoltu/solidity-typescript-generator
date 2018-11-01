@@ -52,7 +52,7 @@ export interface EventDescription {
 }
 
 export const eventDescriptions: { [signatureHash: string]: EventDescription } = {
-	
+	'0x7370a62ee3c7c340084cac325e4791fd5cbc470fac97c3a6799fb43c0ab5a266': {"name":"durian","signature":"durian(uint256,string,bytes,address)","signatureHash":"0x7370a62ee3c7c340084cac325e4791fd5cbc470fac97c3a6799fb43c0ab5a266","parameters":[{"indexed":false,"name":"a","type":"uint256"},{"indexed":true,"name":"b","type":"string"},{"indexed":false,"name":"c","type":"bytes"},{"indexed":true,"name":"d","type":"address"}]}
 }
 
 
@@ -168,22 +168,21 @@ export class Contract<TBigNumber> {
 }
 
 
-export class banana<TBigNumber> extends Contract<TBigNumber> {
+export class Banana<TBigNumber> extends Contract<TBigNumber> {
 	public constructor(dependencies: Dependencies<TBigNumber>, address: string) {
 		super(dependencies, address)
 	}
 
-	public cherry = async(durian: TBigNumber, options?: { sender?: string, attachedEth?: TBigNumber }): Promise<Array<Event>> => {
+	public cherry = async(options?: { sender?: string, attachedEth?: TBigNumber }): Promise<Array<Event>> => {
 		options = options || {}
-		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[{"name":"durian","type":"uint256"}],"outputs":[{"name":"eggplant","type":"bool"}]}
-		return await this.remoteCall(abi, [durian], 'cherry', options.sender, options.attachedEth)
+		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[],"outputs":[]}
+		return await this.remoteCall(abi, [], 'cherry', options.sender, options.attachedEth)
 	}
 
-	public cherry_ = async(durian: TBigNumber, options?: { sender?: string, attachedEth?: TBigNumber }): Promise<boolean> => {
+	public cherry_ = async(options?: { sender?: string, attachedEth?: TBigNumber }): Promise<void> => {
 		options = options || {}
-		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[{"name":"durian","type":"uint256"}],"outputs":[{"name":"eggplant","type":"bool"}]}
-		const result = await this.localCall(abi, [durian], options.sender, options.attachedEth)
-		return <boolean>result[0]
+		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[],"outputs":[]}
+		await this.localCall(abi, [], options.sender, options.attachedEth)
 	}
 }
 
