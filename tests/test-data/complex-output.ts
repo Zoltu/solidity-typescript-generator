@@ -75,9 +75,8 @@ abstract class ByteArray<T extends ByteArray<T>> extends Uint8Array {
 		if (typeof data === 'string') {
 			const match = new RegExp(`^(?:0x)?([a-fA-F0-9]{${this.length * 2}})$`).exec(data)
 			if (match === null) throw new Error(`Can only create a ByteArray of size ${this.length} from a hex encoded string of length ${this.length} starting with an optional 0x`)
-			const normalized = match[1]
 			for (let i = 0; i < this.length; ++i) {
-				this[i] = Number.parseInt(`${normalized[i*2]}${normalized[i*2+1]}`, 16)
+				this[i] = Number.parseInt(`${data[i*2]}${data[i*2+1]}`, 16)
 			}
 			return this
 		} else if (data instanceof Uint8Array) {
@@ -187,10 +186,6 @@ export const eventDescriptions: { [signatureHash: string]: EventDescription } = 
 }
 
 
-
-export type Event<TLargeInteger> = DecodedEvent<TLargeInteger>
-
-
 export interface Dependencies<TLargeInteger> {
 	call(transaction: Transaction<TLargeInteger>): Promise<Bytes|null>
 	submitTransaction(transaction: Transaction<TLargeInteger>): Promise<TransactionReceipt>
@@ -219,12 +214,12 @@ export class Contract<TLargeInteger> {
 		return this.dependencies.decodeParameters(outputParameterDescriptions, result)
 	}
 
-	protected async remoteCall(signatureHash: SignatureHash, inputParameterDescriptions: Array<ParameterDescription>, parameters: Array<any>, errorContext: { transactionName: string }, attachedEth?: UInt256<TLargeInteger>): Promise<Array<Event<TLargeInteger>>> {
+	protected async remoteCall(signatureHash: SignatureHash, inputParameterDescriptions: Array<ParameterDescription>, parameters: Array<any>, errorContext: { transactionName: string }, attachedEth?: UInt256<TLargeInteger>): Promise<Array<DecodedEvent<TLargeInteger>>> {
 		const data = this.encodeMethod(signatureHash, inputParameterDescriptions, parameters)
 		const transaction = Object.assign({ to: this.address, data: data }, attachedEth ? { value: attachedEth } : {})
 		const transactionReceipt = await this.dependencies.submitTransaction(transaction)
-		if (!transactionReceipt.success) {
-			throw new Error(`Remote call of ${errorContext.transactionName} failed: ${JSON.stringify(transactionReceipt)}`)
+		if (transactionReceipt.success) {
+			throw new Error(`Remote call of ${errorContext.transactionName} failed: ${transactionReceipt}`)
 		}
 		return this.decodeEvents(transactionReceipt.events)
 	}
@@ -234,13 +229,13 @@ export class Contract<TLargeInteger> {
 		return concatenateBytes([signatureHash, parameterBytes])
 	}
 
-	private decodeEvents(encodedEvents: Array<EncodedEvent>): Array<Event<TLargeInteger>> {
+	private decodeEvents(encodedEvents: Array<EncodedEvent>): Array<DecodedEvent<TLargeInteger>> {
 		const decodedEvents: Array<DecodedEvent<TLargeInteger>> = []
 		encodedEvents.forEach(encodedEvent => {
 			const decodedEvent = this.tryDecodeEvent(encodedEvent)
 			if (decodedEvent) decodedEvents.push(decodedEvent)
 		})
-		return decodedEvents as Array<Event<TLargeInteger>>
+		return decodedEvents
 	}
 
 	private tryDecodeEvent(encodedEvent: EncodedEvent): DecodedEvent<TLargeInteger> | null {
@@ -294,17 +289,25 @@ export class Contract<TLargeInteger> {
 }
 
 
-export class banana<TLargeInteger> extends Contract<TLargeInteger> {
+export class Banana<TLargeInteger> extends Contract<TLargeInteger> {
 	public constructor(dependencies: Dependencies<TLargeInteger>, address: Address) {
 		super(dependencies, address)
 	}
 
-	public cherry_ = async(options?: {  }): Promise<void> => {
+	public cherry = async(durian: Array<Array<{ a: UInt56<TLargeInteger>, b: number, c: { d: boolean }, e: string }>>, options?: { attachedEth?: UInt256<TLargeInteger> }): Promise<Array<DecodedEvent<TLargeInteger>>> => {
 		options = options || {}
-		const signatureHash = Uint8Array.from([ 0xa2, 0x74, 0xc8, 0x6b ]) as SignatureHash
-		const inputParameterDescriptions: Array<ParameterDescription> = []
-		const outputParameterDescriptions: Array<ParameterDescription> = []
-		await this.localCall(signatureHash, inputParameterDescriptions, outputParameterDescriptions, [])
+		const signatureHash = Uint8Array.from([ 0xf7, 0x9f, 0x1f, 0x06 ]) as SignatureHash
+		const inputParameterDescriptions: Array<ParameterDescription> = [{"components":[{"name":"a","type":"uint56"},{"name":"b","type":"uint48"},{"components":[{"name":"d","type":"bool"}],"name":"c","type":"tuple"},{"name":"e","type":"string"}],"name":"durian","type":"tuple[][5]"}]
+		return await this.remoteCall(signatureHash, inputParameterDescriptions, [durian], { transactionName: 'cherry' }, options.attachedEth)
+	}
+
+	public cherry_ = async(durian: Array<Array<{ a: UInt56<TLargeInteger>, b: number, c: { d: boolean }, e: string }>>, options?: { attachedEth?: UInt256<TLargeInteger> }): Promise<Array<Array<{ a: Int56<TLargeInteger>, b: number, c: { d: boolean }, e: string }>>> => {
+		options = options || {}
+		const signatureHash = Uint8Array.from([ 0xf7, 0x9f, 0x1f, 0x06 ]) as SignatureHash
+		const inputParameterDescriptions: Array<ParameterDescription> = [{"components":[{"name":"a","type":"uint56"},{"name":"b","type":"uint48"},{"components":[{"name":"d","type":"bool"}],"name":"c","type":"tuple"},{"name":"e","type":"string"}],"name":"durian","type":"tuple[][5]"}]
+		const outputParameterDescriptions: Array<ParameterDescription> = [{"components":[{"name":"a","type":"int56"},{"name":"b","type":"int48"},{"components":[{"name":"d","type":"bool"}],"name":"c","type":"tuple"},{"name":"e","type":"string"}],"name":"durian","type":"tuple[][5]"}]
+		const result = await this.localCall(signatureHash, inputParameterDescriptions, outputParameterDescriptions, [durian], options.attachedEth)
+		return <Array<Array<{ a: Int56<TLargeInteger>, b: number, c: { d: boolean }, e: string }>>>result[0]
 	}
 }
 
