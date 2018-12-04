@@ -433,8 +433,8 @@ export function tryDecodeBoolean(description: ParameterDescription, data: BytesL
 	return { result: !!decoded, consumed: 32 }
 }
 
-export function tryDecodeSmallNumber(description: ParameterDescription, data: BytesLike): { result: UInt8 | UInt16 | UInt24 | UInt32 | UInt40 | UInt48 | Int8 | Int16 | Int24 | Int32 | Int40 | Int48, consumed: number } | null {
-	const match = /^(u?)int(\d*)$/.exec(description.type)
+export function tryDecodeSmallNumber(description: ParameterDescription, data: BytesLike): { result: UInt8 | UInt16 | UInt24 | UInt32 | UInt40 | UInt48 | Int8 | Int16 | Int24 | Int32 | Int40 | Int48, consumed: number } | null | undefined {
+	const match = /^u?int(\d*)$/.exec(description.type)
 	if (match === null) return null
 	const size = Number.parseInt(match[1])
 	if (size > 52) return null
