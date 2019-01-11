@@ -92,9 +92,9 @@ export interface AbiFunction {
 	outputs: Array<AbiParameter>
 }
 
-export interface Transaction <TBigNumber> {
+export interface Transaction<TBigNumber> {
 	to: string
-	from: string
+	from?: string
 	data: string
 	value?: TBigNumber
 }
@@ -122,7 +122,7 @@ export interface EventDescription {
 }
 
 export const eventDescriptions: { [signatureHash: string]: EventDescription } = {
-	${Array.from(eventDescriptions.values()).join(',\n\t')}
+${Array.of(...eventDescriptions.values()).map(x => `\t${x}`).join(',\n')}
 }
 
 
@@ -131,7 +131,7 @@ export interface Dependencies<TBigNumber> {
 	keccak256(utf8String: string): string
 	encodeParams(abi: AbiFunction, parameters: Array<any>): string
 	decodeParams(abi: Array<AbiParameter>, encoded: string): Array<any>
-	getDefaultAddress(): Promise<string>
+	getDefaultAddress(): Promise<string | undefined>
 	call(transaction: Transaction<TBigNumber>): Promise<string>
 	submitTransaction(transaction: Transaction<TBigNumber>): Promise<TransactionReceipt>
 }
@@ -152,7 +152,7 @@ export class Contract<TBigNumber> {
 	protected async localCall(abi: AbiFunction, parameters: Array<any>, sender?: string, attachedEth?: TBigNumber): Promise<any> {
 		const from = sender || await this.dependencies.getDefaultAddress()
 		const data = this.encodeMethod(abi, parameters)
-		const transaction = Object.assign({ from: from, to: this.address, data: data }, attachedEth ? { value: attachedEth } : {})
+		const transaction = Object.assign({ to: this.address, data: data }, attachedEth ? { value: attachedEth } : {}, from ? { from: from } : {})
 		const result = await this.dependencies.call(transaction)
 		if (result === '0x') throw new Error(\`Call returned '0x' indicating failure.\`)
 		return this.dependencies.decodeParams(abi.outputs, result)
@@ -161,7 +161,7 @@ export class Contract<TBigNumber> {
 	protected async remoteCall(abi: AbiFunction, parameters: Array<any>, txName: string, sender?: string, attachedEth?: TBigNumber): Promise<Array<Event>> {
 		const from = sender || await this.dependencies.getDefaultAddress()
 		const data = this.encodeMethod(abi, parameters)
-		const transaction = Object.assign({ from: from, to: this.address, data: data }, attachedEth ? { value: attachedEth } : {})
+		const transaction = Object.assign({ to: this.address, data: data }, attachedEth ? { value: attachedEth } : {}, from ? { from: from } : {})
 		const transactionReceipt = await this.dependencies.submitTransaction(transaction)
 		if (transactionReceipt.status != 1) {
 			throw new Error(\`Tx \${txName} failed: \${transactionReceipt}\`)
@@ -220,7 +220,7 @@ export class Contract<TBigNumber> {
 		if (!decodedIndexedParameters) throw new Error(\`Failed to decode topics for event \${errorContext.eventSignature}.\\n\${indexedData}\`)
 		const decodedNonIndexedParameters = this.dependencies.decodeParams(nonIndexedTypesForDecoding, nonIndexedData)
 		if (!decodedNonIndexedParameters) throw new Error(\`Failed to decode data for event \${errorContext.eventSignature}.\\n\${nonIndexedData}\`)
-		const result: {[name: string]: any} = {}
+		const result: { [name: string]: any } = {}
 		indexedTypesForDecoding.forEach((parameter, i) => result[parameter.name] = decodedIndexedParameters[i])
 		nonIndexedTypesForDecoding.forEach((parameter, i) => result[parameter.name] = decodedNonIndexedParameters[i])
 		return result
@@ -286,7 +286,7 @@ function remoteMethodTemplate(abiFunction: AbiFunction, errorContext: { contract
 	const argNames: string = toArgNameString(abiFunction)
 	const params: string = toParamsString(abiFunction, errorContext)
 	const options: string = `{ sender?: string${abiFunction.payable ? ', attachedEth?: TBigNumber' : ''} }`
-	return `	public ${abiFunction.name} = async(${params}options?: ${options}): Promise<Array<Event>> => {
+	return `	public ${abiFunction.name} = async (${params}options?: ${options}): Promise<Array<Event>> => {
 		options = options || {}
 		const abi: AbiFunction = ${JSON.stringify(abiFunction)}
 		return await this.remoteCall(abi, [${argNames}], '${abiFunction.name}', options.sender${abiFunction.payable ? ', options.attachedEth' : ''})
@@ -302,7 +302,7 @@ function localMethodTemplate(abiFunction: AbiFunction, errorContext: { contractN
 	const returnValue: string = (abiFunction.outputs.length === 1)
 		? `<${returnType}>result[0]`
 		: `<${returnType}>result`
-	return `	public ${abiFunction.name}_ = async(${params}options?: ${options}): Promise<${returnPromiseType}> => {
+	return `	public ${abiFunction.name}_ = async (${params}options?: ${options}): Promise<${returnPromiseType}> => {
 		options = options || {}
 		const abi: AbiFunction = ${JSON.stringify(abiFunction)}
 		${abiFunction.outputs.length !== 0 ? 'const result = ' : ''}await this.localCall(abi, [${argNames}], options.sender${abiFunction.payable ? ', options.attachedEth' : ''})${abiFunction.outputs.length !== 0 ? `\n\t\treturn ${returnValue}` : ''}

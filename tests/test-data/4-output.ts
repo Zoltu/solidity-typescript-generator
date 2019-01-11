@@ -22,9 +22,9 @@ export interface AbiFunction {
 	outputs: Array<AbiParameter>
 }
 
-export interface Transaction <TBigNumber> {
+export interface Transaction<TBigNumber> {
 	to: string
-	from: string
+	from?: string
 	data: string
 	value?: TBigNumber
 }
@@ -52,7 +52,7 @@ export interface EventDescription {
 }
 
 export const eventDescriptions: { [signatureHash: string]: EventDescription } = {
-	
+
 }
 
 
@@ -61,7 +61,7 @@ export interface Dependencies<TBigNumber> {
 	keccak256(utf8String: string): string
 	encodeParams(abi: AbiFunction, parameters: Array<any>): string
 	decodeParams(abi: Array<AbiParameter>, encoded: string): Array<any>
-	getDefaultAddress(): Promise<string>
+	getDefaultAddress(): Promise<string | undefined>
 	call(transaction: Transaction<TBigNumber>): Promise<string>
 	submitTransaction(transaction: Transaction<TBigNumber>): Promise<TransactionReceipt>
 }
@@ -82,7 +82,7 @@ export class Contract<TBigNumber> {
 	protected async localCall(abi: AbiFunction, parameters: Array<any>, sender?: string, attachedEth?: TBigNumber): Promise<any> {
 		const from = sender || await this.dependencies.getDefaultAddress()
 		const data = this.encodeMethod(abi, parameters)
-		const transaction = Object.assign({ from: from, to: this.address, data: data }, attachedEth ? { value: attachedEth } : {})
+		const transaction = Object.assign({ to: this.address, data: data }, attachedEth ? { value: attachedEth } : {}, from ? { from: from } : {})
 		const result = await this.dependencies.call(transaction)
 		if (result === '0x') throw new Error(`Call returned '0x' indicating failure.`)
 		return this.dependencies.decodeParams(abi.outputs, result)
@@ -91,7 +91,7 @@ export class Contract<TBigNumber> {
 	protected async remoteCall(abi: AbiFunction, parameters: Array<any>, txName: string, sender?: string, attachedEth?: TBigNumber): Promise<Array<Event>> {
 		const from = sender || await this.dependencies.getDefaultAddress()
 		const data = this.encodeMethod(abi, parameters)
-		const transaction = Object.assign({ from: from, to: this.address, data: data }, attachedEth ? { value: attachedEth } : {})
+		const transaction = Object.assign({ to: this.address, data: data }, attachedEth ? { value: attachedEth } : {}, from ? { from: from } : {})
 		const transactionReceipt = await this.dependencies.submitTransaction(transaction)
 		if (transactionReceipt.status != 1) {
 			throw new Error(`Tx ${txName} failed: ${transactionReceipt}`)
@@ -150,7 +150,7 @@ export class Contract<TBigNumber> {
 		if (!decodedIndexedParameters) throw new Error(`Failed to decode topics for event ${errorContext.eventSignature}.\n${indexedData}`)
 		const decodedNonIndexedParameters = this.dependencies.decodeParams(nonIndexedTypesForDecoding, nonIndexedData)
 		if (!decodedNonIndexedParameters) throw new Error(`Failed to decode data for event ${errorContext.eventSignature}.\n${nonIndexedData}`)
-		const result: {[name: string]: any} = {}
+		const result: { [name: string]: any } = {}
 		indexedTypesForDecoding.forEach((parameter, i) => result[parameter.name] = decodedIndexedParameters[i])
 		nonIndexedTypesForDecoding.forEach((parameter, i) => result[parameter.name] = decodedNonIndexedParameters[i])
 		return result
@@ -173,13 +173,13 @@ export class banana<TBigNumber> extends Contract<TBigNumber> {
 		super(dependencies, address)
 	}
 
-	public cherry = async(durian: TBigNumber, options?: { sender?: string, attachedEth?: TBigNumber }): Promise<Array<Event>> => {
+	public cherry = async (durian: TBigNumber, options?: { sender?: string, attachedEth?: TBigNumber }): Promise<Array<Event>> => {
 		options = options || {}
 		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[{"name":"durian","type":"uint256"}],"outputs":[{"name":"eggplant","type":"bool"}]}
 		return await this.remoteCall(abi, [durian], 'cherry', options.sender, options.attachedEth)
 	}
 
-	public cherry_ = async(durian: TBigNumber, options?: { sender?: string, attachedEth?: TBigNumber }): Promise<boolean> => {
+	public cherry_ = async (durian: TBigNumber, options?: { sender?: string, attachedEth?: TBigNumber }): Promise<boolean> => {
 		options = options || {}
 		const abi: AbiFunction = {"name":"cherry","type":"function","constant":false,"payable":true,"stateMutability":"payable","inputs":[{"name":"durian","type":"uint256"}],"outputs":[{"name":"eggplant","type":"bool"}]}
 		const result = await this.localCall(abi, [durian], options.sender, options.attachedEth)
