@@ -687,6 +687,26 @@ export class Contract<TLargeInteger> {
 }
 
 
+export class Banana<TLargeInteger> extends Contract<TLargeInteger> {
+	public constructor(dependencies: Dependencies<TLargeInteger>, address: Address) {
+		super(dependencies, address)
+	}
+
+	public cherry = async (durian: Array<Array<{ a: UInt40<TLargeInteger>, b: UInt32, c: { d: boolean }, e: string }>>, attachedEth?: UInt256<TLargeInteger>): Promise<Array<Event<TLargeInteger>>> => {
+		const signatureHash = SignatureHash.fromByteArray([ 0xf7, 0x9f, 0x1f, 0x06 ])
+		const inputParameterDescriptions: Array<ParameterDescription> = [{"components":[{"name":"a","type":"uint40"},{"name":"b","type":"uint32"},{"components":[{"name":"d","type":"bool"}],"name":"c","type":"tuple"},{"name":"e","type":"string"}],"name":"durian","type":"tuple[][5]"}]
+		return await this.remoteCall(signatureHash, inputParameterDescriptions, [durian], { transactionName: 'cherry' }, attachedEth)
+	}
+
+	public cherry_ = async (durian: Array<Array<{ a: UInt40<TLargeInteger>, b: UInt32, c: { d: boolean }, e: string }>>, attachedEth?: UInt256<TLargeInteger>): Promise<Array<Array<{ a: Int40<TLargeInteger>, b: Int32, c: { d: boolean }, e: string }>>> => {
+		const signatureHash = SignatureHash.fromByteArray([ 0xf7, 0x9f, 0x1f, 0x06 ])
+		const inputParameterDescriptions: Array<ParameterDescription> = [{"components":[{"name":"a","type":"uint40"},{"name":"b","type":"uint32"},{"components":[{"name":"d","type":"bool"}],"name":"c","type":"tuple"},{"name":"e","type":"string"}],"name":"durian","type":"tuple[][5]"}]
+		const outputParameterDescriptions: Array<ParameterDescription> = [{"components":[{"name":"a","type":"int40"},{"name":"b","type":"int32"},{"components":[{"name":"d","type":"bool"}],"name":"c","type":"tuple"},{"name":"e","type":"string"}],"name":"durian","type":"tuple[][5]"}]
+		const result = await this.localCall(signatureHash, inputParameterDescriptions, outputParameterDescriptions, [durian], attachedEth)
+		return <Array<Array<{ a: Int40<TLargeInteger>, b: Int32, c: { d: boolean }, e: string }>>>result.durian
+	}
+}
+
 
 // helpers
 

@@ -1,0 +1,77 @@
+{
+	"contracts": {
+		"Apple": {
+			"Banana": {
+				"abi": [
+					{
+						"name": "cherry",
+						"type": "function",
+						"constant": false,
+						"payable": true,
+						"stateMutability": "payable",
+						"inputs": [
+							{
+								"components": [
+									{
+										"name": "a",
+										"type": "uint40"
+									},
+									{
+										"name": "b",
+										"type": "uint32"
+									},
+									{
+										"components": [
+											{
+												"name": "d",
+												"type": "bool"
+											}
+										],
+										"name": "c",
+										"type": "tuple"
+									},
+									{
+										"name": "e",
+										"type": "string"
+									}
+								],
+								"name": "durian",
+								"type": "tuple[][5]"
+							}
+						],
+						"outputs": [
+							{
+								"components": [
+									{
+										"name": "a",
+										"type": "int40"
+									},
+									{
+										"name": "b",
+										"type": "int32"
+									},
+									{
+										"components": [
+											{
+												"name": "d",
+												"type": "bool"
+											}
+										],
+										"name": "c",
+										"type": "tuple"
+									},
+									{
+										"name": "e",
+										"type": "string"
+									}
+								],
+								"name": "durian",
+								"type": "tuple[][5]"
+							}
+						]
+					}
+				]
+			}
+		}
+	}
+}

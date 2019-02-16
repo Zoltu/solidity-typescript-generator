@@ -687,6 +687,20 @@ export class Contract<TLargeInteger> {
 }
 
 
+export class banana<TLargeInteger> extends Contract<TLargeInteger> {
+	public constructor(dependencies: Dependencies<TLargeInteger>, address: Address) {
+		super(dependencies, address)
+	}
+
+	public cherry_ = async (): Promise<boolean> => {
+		const signatureHash = SignatureHash.fromByteArray([ 0xa2, 0x74, 0xc8, 0x6b ])
+		const inputParameterDescriptions: Array<ParameterDescription> = []
+		const outputParameterDescriptions: Array<ParameterDescription> = [{"name":"","type":"bool"}]
+		const result = await this.localCall(signatureHash, inputParameterDescriptions, outputParameterDescriptions, [])
+		return <boolean>result.result
+	}
+}
+
 
 // helpers
 
