@@ -1,6 +1,6 @@
 {
   "name": "solidity-typescript-generator",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "description": "Takes in a solidity file and generatese a set of TypeScript classes for interacting with the contract.",
   "main": "output/index.js",
   "scripts": {
@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/Zoltu/solidity-typescript-generator#readme",
   "devDependencies": {
-    "typescript": "3.1.3"
+    "typescript": "3.1.6"
   },
   "dependencies": {
     "js-sha3": "0.8.0"
