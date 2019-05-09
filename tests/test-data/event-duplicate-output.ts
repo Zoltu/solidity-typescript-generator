@@ -77,10 +77,10 @@ abstract class ByteArray extends Uint8Array {
 		return result as InstanceType<TConstructor>
 	}
 	static fromHexString<TConstructor extends typeof ByteArray & { new(): InstanceType<TConstructor> }>(this: TConstructor, hex: string): InstanceType<TConstructor> {
-		const match = new RegExp(`^(?:0x)?([a-fA-F0-9]*)$`).exec(hex)
+		const match = /^(?:0x)?([a-fA-F0-9]*)$/.exec(hex)
 		if (match === null) throw new Error(`Expected a hex string encoded byte array with an optional '0x' prefix but received ${hex}`)
-		if (match.length % 2) throw new Error(`Hex string encoded byte array must be an even number of charcaters long.`)
 		const normalized = match[1]
+		if (normalized.length % 2) throw new Error(`Hex string encoded byte array must be an even number of charcaters long.`)
 		const bytes = []
 		for (let i = 0; i < normalized.length; i += 2) {
 			bytes.push(Number.parseInt(`${normalized[i]}${normalized[i+1]}`, 16))
