@@ -1,6 +1,6 @@
 {
   "name": "solidity-typescript-generator",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Takes in a solidity file and generatese a set of TypeScript classes for interacting with the contract.",
   "main": "output/index.js",
   "scripts": {

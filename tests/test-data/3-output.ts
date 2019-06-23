@@ -137,8 +137,42 @@ export class Bytes4 extends ByteArray { constructor() { super(4) }; Bytes4: unkn
 export class Bytes3 extends ByteArray { constructor() { super(3) }; Bytes3: unknown }
 export class Bytes2 extends ByteArray { constructor() { super(2) }; Bytes2: unknown }
 export class Bytes1 extends ByteArray { constructor() { super(1) }; Bytes1: unknown }
-export class Address extends ByteArray { constructor() { super(20) }; Address: unknown }
+export class Address extends ByteArray { constructor() { super(20); }; Address: unknown }
 export class SignatureHash extends ByteArray { constructor() { super(4) }; SignatureHash: unknown }
+export interface Bytes32 { readonly length: 32 }
+export interface Bytes31 { readonly length: 31 }
+export interface Bytes30 { readonly length: 30 }
+export interface Bytes29 { readonly length: 29 }
+export interface Bytes28 { readonly length: 28 }
+export interface Bytes27 { readonly length: 27 }
+export interface Bytes26 { readonly length: 26 }
+export interface Bytes25 { readonly length: 25 }
+export interface Bytes24 { readonly length: 24 }
+export interface Bytes23 { readonly length: 23 }
+export interface Bytes22 { readonly length: 22 }
+export interface Bytes21 { readonly length: 21 }
+export interface Bytes20 { readonly length: 20 }
+export interface Bytes19 { readonly length: 19 }
+export interface Bytes18 { readonly length: 18 }
+export interface Bytes17 { readonly length: 17 }
+export interface Bytes16 { readonly length: 16 }
+export interface Bytes15 { readonly length: 15 }
+export interface Bytes14 { readonly length: 14 }
+export interface Bytes13 { readonly length: 13 }
+export interface Bytes12 { readonly length: 12 }
+export interface Bytes11 { readonly length: 11 }
+export interface Bytes10 { readonly length: 10 }
+export interface Bytes9 { readonly length: 9 }
+export interface Bytes8 { readonly length: 8 }
+export interface Bytes7 { readonly length: 7 }
+export interface Bytes6 { readonly length: 6 }
+export interface Bytes5 { readonly length: 5 }
+export interface Bytes4 { readonly length: 4 }
+export interface Bytes3 { readonly length: 3 }
+export interface Bytes2 { readonly length: 2 }
+export interface Bytes1 { readonly length: 1 }
+export interface Address { readonly length: 20 }
+export interface SignatureHash { readonly length: 4 }
 export type LargeSignedNumberLike<TLargeInteger> = Int256<TLargeInteger> | Int248<TLargeInteger> | Int240<TLargeInteger> | Int232<TLargeInteger> | Int224<TLargeInteger> | Int216<TLargeInteger> | Int208<TLargeInteger> | Int200<TLargeInteger> | Int192<TLargeInteger> | Int184<TLargeInteger> | Int176<TLargeInteger> | Int168<TLargeInteger> | Int160<TLargeInteger> | Int152<TLargeInteger> | Int144<TLargeInteger> | Int136<TLargeInteger> | Int128<TLargeInteger> | Int120<TLargeInteger> | Int112<TLargeInteger> | Int104<TLargeInteger> | Int96<TLargeInteger> | Int88<TLargeInteger> | Int80<TLargeInteger> | Int72<TLargeInteger> | Int64<TLargeInteger> | Int56<TLargeInteger> | Int48<TLargeInteger> | Int40<TLargeInteger>
 export type LargeUnsignedNumberLike<TLargeInteger> = UInt256<TLargeInteger> | UInt248<TLargeInteger> | UInt240<TLargeInteger> | UInt232<TLargeInteger> | UInt224<TLargeInteger> | UInt216<TLargeInteger> | UInt208<TLargeInteger> | UInt200<TLargeInteger> | UInt192<TLargeInteger> | UInt184<TLargeInteger> | UInt176<TLargeInteger> | UInt168<TLargeInteger> | UInt160<TLargeInteger> | UInt152<TLargeInteger> | UInt144<TLargeInteger> | UInt136<TLargeInteger> | UInt128<TLargeInteger> | UInt120<TLargeInteger> | UInt112<TLargeInteger> | UInt104<TLargeInteger> | UInt96<TLargeInteger> | UInt88<TLargeInteger> | UInt80<TLargeInteger> | UInt72<TLargeInteger> | UInt64<TLargeInteger> | UInt56<TLargeInteger> | UInt48<TLargeInteger> | UInt40<TLargeInteger>
 export type LargeNumberLike<TLargeInteger> = LargeSignedNumberLike<TLargeInteger> | LargeUnsignedNumberLike<TLargeInteger>
