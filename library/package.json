@@ -1,12 +1,13 @@
 {
-  "name": "solidity-typescript-generator",
-  "version": "2.1.0",
+  "name": "@zoltu/solidity-typescript-generator",
+  "version": "3.0.0",
   "description": "Takes in a solidity file and generatese a set of TypeScript classes for interacting with the contract.",
   "main": "output/index.js",
   "scripts": {
     "build": "tsc",
     "test": "cd ../tests && npm run test",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build && cd ../tests && npm run test && cd ../library && node --eval \"require('fs').copyFile('../README.md', 'README.md', error => {if(error) throw error})\"",
+    "postpublish": "node --eval \"require('fs').unlink('README.md', error => {if(error) throw error})\""
   },
   "repository": {
     "type": "git",
@@ -19,9 +20,10 @@
   },
   "homepage": "https://github.com/Zoltu/solidity-typescript-generator#readme",
   "devDependencies": {
-    "typescript": "3.3.3"
+    "typescript": "3.6.4"
   },
   "dependencies": {
-    "js-sha3": "0.8.0"
+    "@zoltu/ethereum-abi-encoder": "3.0.1",
+    "@zoltu/ethereum-crypto": "1.0.1"
   }
 }
