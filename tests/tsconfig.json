@@ -1,11 +1,11 @@
 {
 	"compilerOptions": {
+		"target": "esnext",
 		"module": "commonjs",
-		"target": "es2018",
 		"noImplicitAny": true,
 		"allowJs": false,
 		"noEmit": true,
 		"strict": true,
-		"lib": [ "es2018", ],
+		"lib": [ "es2018", "esnext.bigint" ],
 	}
 }
