@@ -1,29 +1,32 @@
-import { generateSignature, AbiDescription, EventDescription, FunctionDescription, ParameterDescription } from '@zoltu/ethereum-abi-encoder'
+import { generateSignature, AbiDescription, EventDescription, FunctionDescription, ParameterDescription, EventParameterDescription } from '@zoltu/ethereum-abi-encoder'
 import { keccak256 } from '@zoltu/ethereum-crypto'
 
-type Abi = Array<AbiDescription>
+type Abi = ReadonlyArray<AbiDescription>
 
 export interface CompilerOutput {
-	contracts: {
+	readonly contracts: {
 		[globalName: string]: {
 			[contractName: string]: {
-				abi: Abi
+				readonly abi: Abi
 			}
 		}
 	}
 }
 
-export async function generateContractInterfaces(contractsOutput: CompilerOutput): Promise<string> {
+export async function generateContractInterfaces(contractsOutput: Readonly<CompilerOutput>): Promise<string> {
 	const contractInterfaces: Array<string> = []
 	const eventDescriptions: Map<string, string> = new Map<string, string>()
 	const eventInterfaces: Array<string> = []
 	const eventTypes: Array<string> = []
 
+	const duplicateCounters: Record<string, number> = {}
 	for (let globalName in contractsOutput.contracts) {
 		for (let contractName in contractsOutput.contracts[globalName]) {
 			const contractAbi: Abi = contractsOutput.contracts[globalName][contractName].abi
 			if (contractAbi.length == 0) continue
-			contractInterfaces.push(contractInterfaceTemplate(contractName, contractAbi))
+			duplicateCounters[contractName] = (duplicateCounters[contractName] || 0) + 1
+			const contractNameSuffix = duplicateCounters[contractName] === 1 ? '' : duplicateCounters[contractName]
+			contractInterfaces.push(contractInterfaceTemplate(`${contractName}${contractNameSuffix}`, contractAbi))
 			for (let abiEvent of contractAbi.filter(abiEntry => abiEntry.type === 'event').map(abiEntry => <EventDescription>abiEntry).filter(abiEvent => abiEvent.name)) {
 				const eventDescription = await eventDescriptionTemplate(abiEvent)
 				eventDescriptions.set(eventDescription.substring(1, 65), eventDescription)
@@ -103,20 +106,20 @@ ${contractInterfaces.join('\n')}`
 function contractInterfaceTemplate(contractName: string, contractAbi: Abi) {
 	const contractMethods: Array<string> = []
 
-	// FIXME: Add support for Solidity function overloads.  Right now overloaded functions are not supported, only the first one seen will servive addition into the following set.
-	const seen: Set<string> = new Set()
+	// FIXME: Add support for Solidity function overloads.  Right now overloaded functions are not supported, only the first one seen will survive addition into the following set.
+	const seenCount: Record<string, number> = {}
 
 	const contractFunctions: Array<FunctionDescription> = contractAbi
 		.filter(abiEntry => abiEntry.type == 'function')
 		.map(abiFunction => <FunctionDescription>abiFunction)
 
 	for (let abiFunction of contractFunctions) {
-		if (seen.has(abiFunction.name)) continue
+		seenCount[abiFunction.name] = (seenCount[abiFunction.name] || 0) + 1
+		const functionName = (seenCount[abiFunction.name] !== 1) ? `${abiFunction.name}${seenCount[abiFunction.name]}` : abiFunction.name
 		if (abiFunction.stateMutability !== 'pure' && abiFunction.stateMutability !== 'view') {
-			contractMethods.push(remoteMethodTemplate(abiFunction, { contractName: contractName}))
+			contractMethods.push(remoteMethodTemplate(functionName, abiFunction, { contractName: contractName}))
 		}
-		contractMethods.push(localMethodTemplate(abiFunction, { contractName: contractName}))
-		seen.add(abiFunction.name)
+		contractMethods.push(localMethodTemplate(functionName, abiFunction, { contractName: contractName}))
 	}
 
 	return `
@@ -137,9 +140,18 @@ async function eventDescriptionTemplate(abiEvent: EventDescription): Promise<str
 		type: 'event',
 		name: abiEvent.name,
 		signature: signature,
-		inputs: abiEvent.inputs,
+		inputs: abiEvent.inputs.map(scrubParameterDescription),
 	}
 	return `'${signatureHash.toString(16)}': ${JSON.stringify(eventDescription)}`
+}
+
+function scrubParameterDescription(parameterDescription: ParameterDescription): ParameterDescription {
+	return {
+		type: parameterDescription.type,
+		name: parameterDescription.name,
+		...( 'components' in parameterDescription ? { components: (parameterDescription.components || []).map(scrubParameterDescription) } : {}),
+		...('indexed' in parameterDescription ? { indexed: (parameterDescription as EventParameterDescription).indexed } : {})
+	}
 }
 
 function eventInterfaceTemplate(contractName: string, abiEvent: EventDescription): string {
@@ -157,21 +169,21 @@ ${
 }`
 }
 
-function remoteMethodTemplate(abiFunction: FunctionDescription, errorContext: { contractName: string }) {
+function remoteMethodTemplate(functionName: string, abiFunction: FunctionDescription, errorContext: { contractName: string }) {
 	const argNames: string = toArgNameString(abiFunction)
 	const params: string = toParamsString(abiFunction, true, errorContext)
 	const methodSignature = generateSignature(abiFunction)
 	const separator = (abiFunction.inputs.length !== 0 && abiFunction.stateMutability === 'payable') ? ', ' : ''
 	const attachedEthInputParameter = (abiFunction.stateMutability === 'payable') ? 'attachedEth?: bigint' : ''
 	const attachedEthCallParameter = (abiFunction.stateMutability === 'payable') ? ', attachedEth' : ''
-	return `	public ${abiFunction.name} = async (${params}${separator}${attachedEthInputParameter}): Promise<Array<Event>> => {
+	return `	public ${functionName} = async (${params}${separator}${attachedEthInputParameter}): Promise<Array<Event>> => {
 		const methodSignature = '${methodSignature}' as const
 		const methodParameters = [${argNames}] as const
 		return await this.remoteCall(methodSignature, methodParameters, { transactionName: '${abiFunction.name}' }${attachedEthCallParameter})
 	}`
 }
 
-function localMethodTemplate(abiFunction: FunctionDescription, errorContext: { contractName: string }) {
+function localMethodTemplate(functionName: string, abiFunction: FunctionDescription, errorContext: { contractName: string }) {
 	const outputs = abiFunction.outputs || []
 	const argNames: string = toArgNameString(abiFunction)
 	const params: string = toParamsString(abiFunction, true, errorContext)
@@ -183,7 +195,7 @@ function localMethodTemplate(abiFunction: FunctionDescription, errorContext: { c
 	const returnValue: string = (outputs.length === 1)
 		? `<${returnType}>result.${outputs[0].name || 'result'}`
 		: `<${returnType}>result`
-	return `	public ${abiFunction.name}_ = async (${params}${separator}${attachedEthInputParameter}): Promise<${returnType}> => {
+	return `	public ${functionName}_ = async (${params}${separator}${attachedEthInputParameter}): Promise<${returnType}> => {
 		const methodSignature = '${methodSignature}' as const
 		const methodParameters = [${argNames}] as const
 		const outputParameterDescriptions = ${JSON.stringify(abiFunction.outputs)} as const

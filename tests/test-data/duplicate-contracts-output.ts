@@ -13,22 +13,12 @@ export interface TransactionReceipt {
 }
 
 export const eventDescriptions: { [signatureHash: string]: EventDescription & {signature: string} } = {
-	'5c4cf109e00bf95f1fe07fc3173b24b6e8f94894407c6ec23c3e5fb82419a6ce': {"type":"event","name":"Durian","signature":"Durian(uint256,string,bytes,address)","inputs":[{"type":"uint256","name":"a","indexed":false},{"type":"string","name":"b","indexed":true},{"type":"bytes","name":"c","indexed":false},{"type":"address","name":"d","indexed":true}]}
+
 }
 
-export namespace Banana {
-	export interface Durian extends DecodedEvent {
-		name: 'Durian'
-		parameters: {
-			a: bigint
-			b: bigint
-			c: Uint8Array
-			d: bigint
-		}
-	}
-}
 
-export type Event = DecodedEvent | Banana.Durian
+
+export type Event = DecodedEvent
 
 
 export interface Dependencies {
@@ -72,21 +62,29 @@ export class Contract {
 }
 
 
-export class Banana extends Contract {
+export class banana extends Contract {
 	public constructor(dependencies: Dependencies, address: bigint) {
 		super(dependencies, address)
 	}
 
-	public cherry = async (attachedEth?: bigint): Promise<Array<Event>> => {
-		const methodSignature = 'cherry()' as const
-		const methodParameters = [] as const
-		return await this.remoteCall(methodSignature, methodParameters, { transactionName: 'cherry' }, attachedEth)
-	}
-
-	public cherry_ = async (attachedEth?: bigint): Promise<void> => {
+	public cherry_ = async (): Promise<void> => {
 		const methodSignature = 'cherry()' as const
 		const methodParameters = [] as const
 		const outputParameterDescriptions = [] as const
-		await this.localCall(methodSignature, outputParameterDescriptions, methodParameters, attachedEth)
+		await this.localCall(methodSignature, outputParameterDescriptions, methodParameters)
+	}
+}
+
+
+export class banana2 extends Contract {
+	public constructor(dependencies: Dependencies, address: bigint) {
+		super(dependencies, address)
+	}
+
+	public cherry_ = async (): Promise<void> => {
+		const methodSignature = 'cherry()' as const
+		const methodParameters = [] as const
+		const outputParameterDescriptions = [] as const
+		await this.localCall(methodSignature, outputParameterDescriptions, methodParameters)
 	}
 }
