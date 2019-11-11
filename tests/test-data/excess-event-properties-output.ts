@@ -77,16 +77,5 @@ export class Banana extends Contract {
 		super(dependencies, address)
 	}
 
-	public cherry = async (attachedEth?: bigint): Promise<Array<Event>> => {
-		const methodSignature = 'cherry()' as const
-		const methodParameters = [] as const
-		return await this.remoteCall(methodSignature, methodParameters, { transactionName: 'cherry' }, attachedEth)
-	}
 
-	public cherry_ = async (attachedEth?: bigint): Promise<void> => {
-		const methodSignature = 'cherry()' as const
-		const methodParameters = [] as const
-		const outputParameterDescriptions = [] as const
-		await this.localCall(methodSignature, outputParameterDescriptions, methodParameters, attachedEth)
-	}
 }

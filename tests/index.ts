@@ -1,18 +1,17 @@
 import { expect, use } from 'chai'
 import * as chaiAsPromised from 'chai-as-promised'
 ;(use as Function)(chaiAsPromised)
-import { readFile as readFileCallback } from 'fs'
-import { promisify } from 'util'
+import { promises as fs } from 'fs'
 import { generateContractInterfaces } from '@zoltu/solidity-typescript-generator'
 import { Dependencies, Banana } from './test-data/event-output'
 
-const readFile = promisify(readFileCallback)
 describe('generateContractInterfaces', async () => {
 	async function testContractGeneration(prefix: string) {
-		const inputJson = await readFile(`./test-data/${prefix}-input.json`, { encoding: 'utf8' })
+		const inputJson = await fs.readFile(`./test-data/${prefix}-input.json`, { encoding: 'utf8' })
 		const input = JSON.parse(inputJson)
-		const expected = await readFile(`./test-data/${prefix}-output.ts`, { encoding: 'utf8' })
+		const expected = await fs.readFile(`./test-data/${prefix}-output.ts`, { encoding: 'utf8' })
 		const result = await generateContractInterfaces(input)
+		// await fs.writeFile(`./test-data/${prefix}-output.ts`, result)
 		expect(result).to.equal(expected)
 	}
 
@@ -36,8 +35,16 @@ describe('generateContractInterfaces', async () => {
 		await testContractGeneration('complex')
 	})
 
+	it(`generates duplicate contract`, async () => {
+		await testContractGeneration('duplicate-contracts')
+	})
+
 	it(`generates event`, async () => {
 		await testContractGeneration('event')
+	})
+
+	it(`generates excess event properties`, async () => {
+		await testContractGeneration('excess-event-properties')
 	})
 
 	it(`generates event duplicate`, async () => {
@@ -57,8 +64,8 @@ describe('generateContractInterfaces', async () => {
 	})
 
 	it(`errors on multiple unnamed returns`, async () => {
-		const inputJson = await readFile(`./test-data/error-multiple-unnamed-returns-input.json`, { encoding: 'utf8' })
-		const expected = await readFile(`./test-data/error-multiple-unnamed-returns-output.txt`, { encoding: 'utf8' })
+		const inputJson = await fs.readFile(`./test-data/error-multiple-unnamed-returns-input.json`, { encoding: 'utf8' })
+		const expected = await fs.readFile(`./test-data/error-multiple-unnamed-returns-output.txt`, { encoding: 'utf8' })
 		const input = JSON.parse(inputJson)
 		const resultPromise = generateContractInterfaces(input)
 		await expect(resultPromise).to.eventually.be.rejectedWith(expected)
@@ -96,9 +103,9 @@ describe('generateContractInterfaces', async () => {
 
 	// useful for doing one-off testing, set to skip so it doesn't run normally
 	it.skip(`sandbox`, async () => {
-		const inputJson = await readFile(`./test-data/event-input.json`, { encoding: 'utf8' })
+		const inputJson = await fs.readFile(`./test-data/event-input.json`, { encoding: 'utf8' })
 		const input = JSON.parse(inputJson)
-		const expected = await readFile(`./test-data/event-output.ts`, { encoding: 'utf8' })
+		const expected = await fs.readFile(`./test-data/event-output.ts`, { encoding: 'utf8' })
 		const result = generateContractInterfaces(input)
 		expect(result).to.equal(expected)
 	})

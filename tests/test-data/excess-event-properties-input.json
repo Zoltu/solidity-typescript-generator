@@ -1,0 +1,38 @@
+{
+	"contracts": {
+		"Apple": {
+			"Banana": {
+				"abi": [
+					{
+						"anonymous": false,
+						"inputs": [
+							{
+								"indexed": false,
+								"name": "a",
+								"type": "uint256",
+								"internalType": "uint256"
+							},
+							{
+								"indexed": true,
+								"name": "b",
+								"type": "string"
+							},
+							{
+								"indexed": false,
+								"name": "c",
+								"type": "bytes"
+							},
+							{
+								"indexed": true,
+								"name": "d",
+								"type": "address"
+							}
+						],
+						"name": "Durian",
+						"type": "event"
+					}
+				]
+			}
+		}
+	}
+}

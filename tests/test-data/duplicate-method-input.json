@@ -1,0 +1,28 @@
+{
+	"contracts": {
+		"apple": {
+			"banana": {
+				"abi": [
+					{
+						"name": "cherry",
+						"type": "function",
+						"constant": true,
+						"payable": false,
+						"stateMutability": "pure",
+						"inputs": [],
+						"outputs": []
+					},
+					{
+						"name": "cherry",
+						"type": "function",
+						"constant": true,
+						"payable": false,
+						"stateMutability": "pure",
+						"inputs": [ { "name": "durian", "type": "uint256" } ],
+						"outputs": []
+					}
+				]
+			}
+		}
+	}
+}
