@@ -1,6 +1,6 @@
 {
   "name": "@zoltu/solidity-typescript-generator",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "Takes in a solidity file and generatese a set of TypeScript classes for interacting with the contract.",
   "main": "output/index.js",
   "scripts": {
@@ -23,7 +23,7 @@
     "typescript": "3.6.4"
   },
   "dependencies": {
-    "@zoltu/ethereum-abi-encoder": "3.0.1",
-    "@zoltu/ethereum-crypto": "1.0.1"
+    "@zoltu/ethereum-abi-encoder": "4.0.0",
+    "@zoltu/ethereum-crypto": "2.1.1"
   }
 }

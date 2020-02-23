@@ -101,6 +101,16 @@ describe('generateContractInterfaces', async () => {
 		expect(durian.parameters.d).to.equal(0xffffffffffffffffffffffffffffffffffffffffn)
 	})
 
+	it(`Error(string) response to eth_call`, async () => {
+		const dependencies: Dependencies = {
+			call: async () => new Uint8Array('08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000039436f6e7472616374206372656174696f6e2072657475726e6564206164647265737320302c20696e6469636174696e67206661696c7572652e00000000000000'.match(/[a-fA-F0-9]{2}/g)!.map(byte => Number.parseInt(byte, 16))),
+			submitTransaction: async () => { throw new Error(`not implemented`) },
+		}
+		const banana = new Banana(dependencies, 0x0000000000000000000000000000000000000000n)
+		const result = banana.cherry_()
+		await expect(result).to.be.rejectedWith('Contract creation returned address 0, indicating failure.')
+	})
+
 	// useful for doing one-off testing, set to skip so it doesn't run normally
 	it.skip(`sandbox`, async () => {
 		const inputJson = await fs.readFile(`./test-data/event-input.json`, { encoding: 'utf8' })

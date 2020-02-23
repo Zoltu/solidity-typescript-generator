@@ -21,6 +21,6 @@
     "typescript": "3.6.4"
   },
   "dependencies": {
-    "@zoltu/ethereum-abi-encoder": "3.0.1"
+    "@zoltu/ethereum-abi-encoder": "4.0.0"
   }
 }
