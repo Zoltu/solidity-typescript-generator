@@ -6,7 +6,6 @@
 		"sourceMap": true,
 		"inlineSources": true,
 		"declaration": true,
-		"noEmit": false,
 		"strict": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,

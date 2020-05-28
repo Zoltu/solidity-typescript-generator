@@ -1,9 +1,15 @@
 {
   "name": "@zoltu/solidity-typescript-generator-fetch-dependencies",
+  "version": "0.1.1",
   "description": "Fetch dependencies for generated typescript classes.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Zoltu/solidity-typescript-generator.git"
+  },
+  "main": "output-cjs/index.js",
+  "exports": {
+    "import": "output-es/index.js",
+    "require": "output-cjs/index.js"
   },
   "license": "Unlicense",
   "dependencies": {
@@ -18,6 +24,11 @@
     "@zoltu/typescript-transformer-append-js-extension": "1.0.1"
   },
   "scripts": {
-    "build": "ttsc --project tsconfig.json"
-  }
+    "build": "ttsc --project tsconfig-es.json && ttsc --project tsconfig-cjs.json"
+  },
+  "files": [
+    "source/",
+    "output-es/",
+    "output-cjs/"
+  ]
 }
