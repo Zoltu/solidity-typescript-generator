@@ -1,19 +1,19 @@
 {
   "name": "@zoltu/solidity-typescript-generator-fetch-dependencies",
-  "version": "0.1.1",
+  "version": "4.0.0",
   "description": "Fetch dependencies for generated typescript classes.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Zoltu/solidity-typescript-generator.git"
   },
+  "license": "Unlicense",
   "main": "output-cjs/index.js",
   "exports": {
     "import": "output-es/index.js",
     "require": "output-cjs/index.js"
   },
-  "license": "Unlicense",
   "dependencies": {
-    "@zoltu/ethereum-abi-encoder": "4.0.0",
+    "@zoltu/ethereum-abi-encoder": "5.0.0",
     "@zoltu/ethereum-crypto": "2.1.1",
     "@zoltu/ethereum-fetch-json-rpc": "12.2.2"
   },

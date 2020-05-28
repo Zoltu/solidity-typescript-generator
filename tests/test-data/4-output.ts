@@ -72,13 +72,13 @@ export class banana extends Contract {
 	}
 
 	public cherry = async (durian: bigint, attachedEth?: bigint): Promise<Array<Event>> => {
-		const methodSignature = 'cherry(uint256)' as const
+		const methodSignature = 'cherry(uint256 durian)' as const
 		const methodParameters = [durian] as const
 		return await this.remoteCall(methodSignature, methodParameters, { transactionName: 'cherry' }, attachedEth)
 	}
 
 	public cherry_ = async (durian: bigint, attachedEth?: bigint): Promise<boolean> => {
-		const methodSignature = 'cherry(uint256)' as const
+		const methodSignature = 'cherry(uint256 durian)' as const
 		const methodParameters = [durian] as const
 		const outputParameterDescriptions = [{"name":"eggplant","type":"bool"}] as const
 		const result = await this.localCall(methodSignature, outputParameterDescriptions, methodParameters, attachedEth)

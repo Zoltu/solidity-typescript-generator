@@ -72,13 +72,13 @@ export class Banana extends Contract {
 	}
 
 	public cherry = async (durian: ReadonlyArray<ReadonlyArray<{ readonly a: bigint, readonly b: bigint, readonly c: { readonly d: boolean }, readonly e: string }>>, attachedEth?: bigint): Promise<Array<Event>> => {
-		const methodSignature = 'cherry((uint40,uint32,(bool),string)[][5])' as const
+		const methodSignature = 'cherry((uint40 a, uint32 b, (bool d) c, string e)[][5] durian)' as const
 		const methodParameters = [durian] as const
 		return await this.remoteCall(methodSignature, methodParameters, { transactionName: 'cherry' }, attachedEth)
 	}
 
 	public cherry_ = async (durian: ReadonlyArray<ReadonlyArray<{ readonly a: bigint, readonly b: bigint, readonly c: { readonly d: boolean }, readonly e: string }>>, attachedEth?: bigint): Promise<Array<Array<{ a: bigint, b: bigint, c: { d: boolean }, e: string }>>> => {
-		const methodSignature = 'cherry((uint40,uint32,(bool),string)[][5])' as const
+		const methodSignature = 'cherry((uint40 a, uint32 b, (bool d) c, string e)[][5] durian)' as const
 		const methodParameters = [durian] as const
 		const outputParameterDescriptions = [{"components":[{"name":"a","type":"int40"},{"name":"b","type":"int32"},{"components":[{"name":"d","type":"bool"}],"name":"c","type":"tuple"},{"name":"e","type":"string"}],"name":"durian","type":"tuple[][5]"}] as const
 		const result = await this.localCall(methodSignature, outputParameterDescriptions, methodParameters, attachedEth)
