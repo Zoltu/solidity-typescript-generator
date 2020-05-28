@@ -1,4 +1,4 @@
-import { generateSignature, AbiDescription, EventDescription, FunctionDescription, ParameterDescription, EventParameterDescription } from '@zoltu/ethereum-abi-encoder'
+import { generateFullSignature, AbiDescription, EventDescription, FunctionDescription, ParameterDescription, EventParameterDescription } from '@zoltu/ethereum-abi-encoder'
 import { keccak256 } from '@zoltu/ethereum-crypto'
 
 type Abi = ReadonlyArray<AbiDescription>
@@ -176,7 +176,7 @@ ${
 function remoteMethodTemplate(functionName: string, abiFunction: FunctionDescription, errorContext: { contractName: string }) {
 	const argNames: string = toArgNameString(abiFunction)
 	const params: string = toParamsString(abiFunction, true, errorContext)
-	const methodSignature = generateSignature(abiFunction)
+	const methodSignature = generateFullSignature(abiFunction)
 	const separator = (abiFunction.inputs.length !== 0 && abiFunction.stateMutability === 'payable') ? ', ' : ''
 	const attachedEthInputParameter = (abiFunction.stateMutability === 'payable') ? 'attachedEth?: bigint' : ''
 	const attachedEthCallParameter = (abiFunction.stateMutability === 'payable') ? ', attachedEth' : ''
@@ -191,7 +191,7 @@ function localMethodTemplate(functionName: string, abiFunction: FunctionDescript
 	const outputs = abiFunction.outputs || []
 	const argNames: string = toArgNameString(abiFunction)
 	const params: string = toParamsString(abiFunction, true, errorContext)
-	const methodSignature = generateSignature(abiFunction)
+	const methodSignature = generateFullSignature(abiFunction)
 	const separator = (abiFunction.inputs.length !== 0 && (abiFunction.stateMutability === 'payable')) ? ', ' : ''
 	const attachedEthInputParameter = (abiFunction.stateMutability === 'payable') ? 'attachedEth?: bigint' : ''
 	const attachedEthCallParameter = (abiFunction.stateMutability === 'payable') ? ', attachedEth' : ''

@@ -4,6 +4,7 @@ import * as chaiAsPromised from 'chai-as-promised'
 import { promises as fs } from 'fs'
 import { generateContractInterfaces } from '@zoltu/solidity-typescript-generator'
 import { Dependencies, Banana } from './test-data/event-output'
+import * as ComplexContract from './test-data/complex-output'
 
 describe('generateContractInterfaces', async () => {
 	async function testContractGeneration(prefix: string) {
@@ -71,6 +72,17 @@ describe('generateContractInterfaces', async () => {
 		await expect(resultPromise).to.eventually.be.rejectedWith(expected)
 	})
 
+	// useful for doing one-off testing, set to skip so it doesn't run normally
+	it.skip(`sandbox`, async () => {
+		const inputJson = await fs.readFile(`./test-data/event-input.json`, { encoding: 'utf8' })
+		const input = JSON.parse(inputJson)
+		const expected = await fs.readFile(`./test-data/event-output.ts`, { encoding: 'utf8' })
+		const result = generateContractInterfaces(input)
+		expect(result).to.equal(expected)
+	})
+})
+
+describe('execute', async () => {
 	it(`execute event`, async () => {
 		const dependencies: Dependencies = {
 			call: async () => new Uint8Array(0),
@@ -111,12 +123,24 @@ describe('generateContractInterfaces', async () => {
 		await expect(result).to.be.rejectedWith('Contract creation returned address 0, indicating failure.')
 	})
 
-	// useful for doing one-off testing, set to skip so it doesn't run normally
-	it.skip(`sandbox`, async () => {
-		const inputJson = await fs.readFile(`./test-data/event-input.json`, { encoding: 'utf8' })
-		const input = JSON.parse(inputJson)
-		const expected = await fs.readFile(`./test-data/event-output.ts`, { encoding: 'utf8' })
-		const result = generateContractInterfaces(input)
-		expect(result).to.equal(expected)
+	it(`can call complex function`, async () => {
+		const dependencies: Dependencies = {
+			call: async () => new Uint8Array(0),
+			submitTransaction: async () => {
+				return ({
+					status: true,
+					logs: [ {
+						topics: [
+							0x5c4cf109e00bf95f1fe07fc3173b24b6e8f94894407c6ec23c3e5fb82419a6cen,
+							0x37e12c06df127fbd6899289cdd9fb12efc8e54dd30f4ddb20a77b4131e042437n,
+							0x000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFn,
+						],
+						data: new Uint8Array('000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000001AA00000000000000000000000000000000000000000000000000000000000000'.match(/[a-fA-F0-9]{2}/g)!.map(byte => Number.parseInt(byte, 16)))
+					}]
+				})
+			}
+		}
+		const banana = new ComplexContract.Banana(dependencies, 0x0n)
+		await banana.cherry([[{ a: 0n, b: 1n, c: { d: true }, e: 'apple' }]])
 	})
 })
