@@ -1,6 +1,6 @@
 {
   "name": "@zoltu/solidity-typescript-generator-fetch-dependencies",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "description": "Fetch dependencies for generated typescript classes.",
   "repository": {
     "type": "git",
@@ -15,7 +15,7 @@
   "dependencies": {
     "@zoltu/ethereum-abi-encoder": "5.0.0",
     "@zoltu/ethereum-crypto": "2.1.1",
-    "@zoltu/ethereum-fetch-json-rpc": "12.2.3"
+    "@zoltu/ethereum-fetch-json-rpc": "13.0.0"
   },
   "devDependencies": {
     "typescript": "3.9.3",
