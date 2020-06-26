@@ -1,6 +1,6 @@
 {
   "name": "@zoltu/solidity-typescript-generator-browser-dependencies",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Ethereum enabled browser dependencies for generated typescript classes.",
   "repository": {
     "type": "git",

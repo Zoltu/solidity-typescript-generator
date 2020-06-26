@@ -52,16 +52,16 @@ export class BrowserDependencies {
 		if ('request' in window.ethereum) {
 			return await window.ethereum.request({ method, params })
 		} else if ('sendAsync' in window.ethereum) {
-			if (!Array.isArray(params)) throw new Error(`Legacy Ethereum browsers do not support non-array RPC parameters.  ${JSON.stringify(params)}`)
+			if (params !== undefined && !Array.isArray(params)) throw new Error(`Legacy Ethereum browsers do not support non-array RPC parameters.  ${JSON.stringify(params)}`)
 			// we capture window.ethereum here to retain type narrowing since TS doesn't understand that the Promise callback function is executed immediately
 			const ethereum = window.ethereum
 			return new Promise((resolve, reject) => {
-				ethereum.sendAsync({ jsonrpc: '2.0', id: 0, method, params }, (error, result) => {
+				ethereum.sendAsync({ jsonrpc: '2.0', id: 0, method, params: params || [] }, (error, response) => {
 					if (error) return reject(unknownErrorToJsonRpcError(error, { request: { method, params } }))
-					if (!isJsonRpcLike(result)) return reject(new Error(NotEthereumBrowserErrorMessage))
-					if ('error' in result) return reject(unknownErrorToJsonRpcError(result.error, { request: { method, params } }))
-					// https://github.com/MetaMask/metamask-extension/issues/7970
-					return resolve(result.result)
+					if (!isJsonRpcLike(response)) return reject(new Error(NotEthereumBrowserErrorMessage))
+					if ('error' in response && response.error !== null && response.error !== undefined) return reject(unknownErrorToJsonRpcError(response.error, { request: { method, params } }))
+					if ('result' in response) return resolve(response.result)
+					return reject(new Error(`Unexpected response from JSON-RPC: ${JSON.stringify(response)}`))
 				})
 			})
 		} else {
@@ -78,13 +78,12 @@ export class BrowserDependencies {
 	private readonly getPrimaryAccount = async (): Promise<bigint | undefined> => {
 		const accounts = await this.ethAccounts()
 		return (accounts.length === 0) ? undefined : accounts[0]
-
 	}
 
 	private readonly makeRequest = <
 		// https://github.com/microsoft/TypeScript/issues/32976 TRequestConstructor should be constrained to constructors that take a string|number|null first parameter
-		TRequestConstructor extends new (...args: any[]) => { wireEncode: () => IJsonRpcRequest<JsonRpcMethod, any[]> },
-		TResponseConstructor extends new (rawResponse: IJsonRpcSuccess<any>) => { result: any },
+		TRequestConstructor extends new (...args: any[]) => { wireEncode: () => IJsonRpcRequest<JsonRpcMethod, unknown[]> },
+		TResponseConstructor extends new (rawResponse: IJsonRpcSuccess<any>) => { result: unknown },
 		TRequest extends InstanceType<TRequestConstructor>,
 		TResponse extends InstanceType<TResponseConstructor>,
 		TResponseResult extends ResultType<TResponse>,
@@ -92,7 +91,7 @@ export class BrowserDependencies {
 		const request = new Request(0, ...args) as TRequest
 		const rawRequest = request.wireEncode() as RawRequestType<TRequest>
 		const rawResponse = await this.request(rawRequest.method, rawRequest.params) as PickFirst<ConstructorParameters<TResponseConstructor>>
-		const response = new Response(rawResponse) as TResponse
+		const response = new Response({jsonrpc: '2.0', id: rawRequest.id, result: rawResponse}) as TResponse
 		return response.result as TResponseResult
 	}
 	private readonly ethAccounts = this.makeRequest(Rpc.Eth.Accounts.Request, Rpc.Eth.Accounts.Response)
@@ -141,6 +140,12 @@ function isPlainObject(maybe: unknown): maybe is object {
 	return true
 }
 
+function isJsonRpcErrorPayload(maybe: unknown): maybe is { code: number, message: string, data?: unknown } {
+	if (typeof maybe !== 'object') return false
+	if (maybe === null) return false
+	return 'code' in maybe && 'message' in maybe
+}
+
 function unknownErrorToJsonRpcError(error: unknown, extraData: object) {
 	if (error instanceof Error) {
 		const mutableError = error as unknown as Record<'code' | 'data', unknown>
@@ -149,12 +154,16 @@ function unknownErrorToJsonRpcError(error: unknown, extraData: object) {
 		if (isPlainObject(mutableError.data)) mergeIn(mutableError.data, extraData)
 		return error
 	}
+	if (isJsonRpcErrorPayload(error)) {
+		const data = isPlainObject(error.data) ? mergeIn(error.data, extraData) : error.data
+		return new JsonRpcError(error.code, error.message, data)
+	}
 	// if someone threw something besides an Error, wrap it up in an error
 	return new JsonRpcError(-32603, `Unexpected thrown value.`, mergeIn({ error }, extraData))
 }
 
 export class JsonRpcError extends Error {
-	constructor(public readonly code: number, message: string, public readonly data?: object) {
+	constructor(public readonly code: number, message: string, public readonly data?: unknown) {
 		super(message)
 		this.name = this.constructor.name
 	}
