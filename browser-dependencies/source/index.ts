@@ -47,7 +47,7 @@ export class BrowserDependencies {
 		return receipt
 	}
 
-	private readonly request = async (method: string, params: unknown) => {
+	public readonly request = async (method: string, params: unknown) => {
 		if (window.ethereum === undefined) throw new Error(NotEthereumBrowserErrorMessage)
 		if ('request' in window.ethereum) {
 			return await window.ethereum.request({ method, params })
@@ -69,13 +69,13 @@ export class BrowserDependencies {
 		}
 	}
 
-	private readonly isEthereumBrowser = () => {
+	public readonly isEthereumBrowser = () => {
 		if (window.ethereum !== undefined) return true
 		if (window.web3 !== undefined) return true
 		return false
 	}
 
-	private readonly getPrimaryAccount = async (): Promise<bigint | undefined> => {
+	public readonly getPrimaryAccount = async (): Promise<bigint | undefined> => {
 		const accounts = await this.ethAccounts()
 		return (accounts.length === 0) ? undefined : accounts[0]
 	}
