@@ -1,16 +1,16 @@
 {
   "name": "@zoltu/solidity-typescript-generator-browser-dependencies",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Ethereum enabled browser dependencies for generated typescript classes.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Zoltu/solidity-typescript-generator.git"
   },
   "license": "Unlicense",
-  "main": "output-cjs/index.js",
+  "main": "./output-cjs/index.js",
   "exports": {
-    "import": "output-es/index.js",
-    "require": "output-cjs/index.js"
+    "import": "./output-es/index.js",
+    "require": "./output-cjs/index.js"
   },
   "dependencies": {
     "@zoltu/ethereum-abi-encoder": "5.0.1",
