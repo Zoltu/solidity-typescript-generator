@@ -1,0 +1,78 @@
+name: Node.js CI
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  job:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: 'actions/checkout@v2'
+      with:
+        ref: '${{ github.event.release.target_commitish }}'
+    - uses: 'actions/setup-node@v1'
+      with:
+        node-version: '14'
+        registry-url: 'https://registry.npmjs.org/'
+    - name: 'set RELEASE_VERSION environment variable'
+      run: 'echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV'
+
+    # version
+    - name: 'version library'
+      working-directory: './library'
+      run: 'npm version --no-git-tag-version ${{ env.RELEASE_VERSION }}'
+    - name: 'version browser-dependencies'
+      working-directory: './browser-dependencies'
+      run: 'npm version --no-git-tag-version ${{ env.RELEASE_VERSION }}'
+    - name: 'version fetch-dependencies'
+      working-directory: './fetch-dependencies'
+      run: 'npm version --no-git-tag-version ${{ env.RELEASE_VERSION }}'
+
+    # install
+    - name: 'npm ci library'
+      working-directory: './library'
+      run: 'npm ci'
+    - name: 'npm ci tests'
+      working-directory: './tests'
+      run: 'npm ci'
+    - name: 'npm ci browser-dependencies'
+      working-directory: './browser-dependencies'
+      run: 'npm ci'
+    - name: 'npm ci fetch-dependencies'
+      working-directory: './fetch-dependencies'
+      run: 'npm ci'
+
+    # build
+    - name: 'build library'
+      working-directory: './library'
+      run: 'npm run build'
+    - name: 'build browser-dependencies'
+      working-directory: './browser-dependencies'
+      run: 'npm run build'
+    - name: 'build fetch-dependencies'
+      working-directory: './fetch-dependencies'
+      run: 'npm run build'
+
+    # test
+    - name: 'test library'
+      working-directory: './tests'
+      run: 'npm run test-no-build'
+
+    # publish
+    - name: 'publish library'
+      working-directory: './library'
+      run: 'npm publish'
+      env:
+        NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+    - name: 'publish browser-dependencies'
+      working-directory: './browser-dependencies'
+      run: 'npm publish'
+      env:
+        NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'
+    - name: 'publish fetch-dependencies'
+      working-directory: './fetch-dependencies'
+      run: 'npm publish'
+      env:
+        NODE_AUTH_TOKEN: '${{ secrets.NPM_TOKEN }}'

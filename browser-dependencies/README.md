@@ -1,4 +1,4 @@
-[![npm version](https://badge.fury.io/js/@zoltu/solidity-typescript-generator-browser-dependencies.svg)](https://badge.fury.io/js/@zoltu/solidity-typescript-generator-browser-dependencies)
+[![npm (scoped)](https://img.shields.io/npm/v/@zoltu/solidity-typescript-generator-browser-dependencies?label=npm%20-%20%40zoltu%2Fsolidity-typescript-generator-browser-dependencies)](@zoltu/solidity-typescript-generator-browser-dependencies)
 
 Dependencies for code generated with @zoltu/solidity-typescript-generator that uses `window.ethereum` provider under the hood.
 

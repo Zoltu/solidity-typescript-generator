@@ -1,4 +1,4 @@
-[![npm version](https://badge.fury.io/js/@zoltu/solidity-typescript-generator.svg)](https://badge.fury.io/js/@zoltu/solidity-typescript-generator)
+[![npm (scoped)](https://img.shields.io/npm/v/@zoltu/solidity-typescript-generator?label=npm%20-%20%40zoltu%2Fsolidity-typescript-generator)](https://www.npmjs.com/package/@zoltu/solidity-typescript-generator)
 
 Takes in the output JSON from `solc` and generatese a set of TypeScript classes for interacting with the contracts it references.
 
