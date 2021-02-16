@@ -1,14 +1,14 @@
 {
   "name": "@zoltu/solidity-typescript-generator",
-  "version": "4.0.3",
+  "version": "0.0.0",
   "description": "Takes in a solidity file and generatese a set of TypeScript classes for interacting with the contract.",
   "main": "./output-cjs/index.js",
   "exports": {
-    "import": "./output-es/index.js",
+    "import": "./output-esm/index.js",
     "require": "./output-cjs/index.js"
   },
   "scripts": {
-    "build": "ttsc --project tsconfig-es.json && ttsc --project tsconfig-cjs.json",
+    "build": "ttsc --project tsconfig-esm.json && ttsc --project tsconfig-cjs.json",
     "test": "cd ../tests && npm run test",
     "prepublishOnly": "npm run build && cd ../tests && npm run test && cd ../library && node --eval \"require('fs').copyFile('../README.md', 'README.md', error => {if(error) throw error})\"",
     "postpublish": "node --eval \"require('fs').unlink('README.md', error => {if(error) throw error})\""
@@ -25,17 +25,17 @@
   "homepage": "https://github.com/Zoltu/solidity-typescript-generator#readme",
   "devDependencies": {
     "@zoltu/typescript-transformer-append-js-extension": "1.0.1",
-    "ts-node": "8.10.2",
-    "ttypescript": "1.5.10",
-    "typescript": "3.9.7"
+    "ts-node": "9.1.1",
+    "ttypescript": "1.5.12",
+    "typescript": "4.1.5"
   },
   "dependencies": {
-    "@zoltu/ethereum-abi-encoder": "5.0.1",
-    "@zoltu/ethereum-crypto": "2.1.1"
+    "@zoltu/ethereum-abi-encoder": "5.0.2",
+    "@zoltu/ethereum-crypto": "2.1.3"
   },
   "files": [
     "source/",
     "output-cjs",
-    "output-es"
+    "output-esm"
   ]
 }

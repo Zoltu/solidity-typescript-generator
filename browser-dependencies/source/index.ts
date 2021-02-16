@@ -5,7 +5,7 @@ import { IOffChainTransaction, Rpc, IJsonRpcRequest, JsonRpcMethod, IJsonRpcSucc
 export const NotEthereumBrowserErrorMessage = `Your browser does not appear to be Ethereum enabled.`
 
 export interface BrowserDependenciesOptions {
-	readonly gasLimitProvider?: (transaction: Omit<IOffChainTransaction, 'gasPrice'> & { gasPrice?: bigint }) => Promise<bigint>
+	readonly gasLimitProvider?: (transaction: Omit<IOffChainTransaction, 'gasLimit'> & { gasPrice: bigint }) => Promise<bigint>
 	readonly gasPriceInAttoethProvider?: () => Promise<bigint>
 }
 
@@ -21,8 +21,7 @@ export class BrowserDependencies {
 
 		const from = await this.getPrimaryAccount() || 0n
 		const data = await encodeMethod(keccak256.hash, methodSignature, parameters)
-		const gasPrice = (this.options.gasPriceInAttoethProvider !== undefined) ? await this.options.gasPriceInAttoethProvider() : await this.ethGasPrice()
-		return await this.ethCall({ from, to, data, value, gasLimit: null, gasPrice })
+		return await this.ethCall({ from, to, data, value })
 	}
 
 	public readonly submitTransaction = async (to: bigint, methodSignature: string, parameters: EncodableArray, value: bigint): Promise<TransactionReceipt> => {
@@ -33,7 +32,7 @@ export class BrowserDependencies {
 		const data = await encodeMethod(keccak256.hash, methodSignature, parameters)
 		const gasPrice = (this.options.gasPriceInAttoethProvider !== undefined) ? await this.options.gasPriceInAttoethProvider() : await this.ethGasPrice()
 
-		const gasEstimatingTransaction = { from, to, value, data, gasLimit: null, gasPrice }
+		const gasEstimatingTransaction = { from, to, value, data, gasPrice }
 		const gasLimit = this.options.gasLimitProvider !== undefined ? await this.options.gasLimitProvider(gasEstimatingTransaction) : await this.ethEstimateGas(gasEstimatingTransaction)
 		const nonce = await this.ethGetTransactionCount(from)
 		const unsignedTransaction = { ...gasEstimatingTransaction, gasLimit, nonce }
