@@ -9,9 +9,7 @@
   },
   "scripts": {
     "build": "ttsc --project tsconfig-esm.json && ttsc --project tsconfig-cjs.json",
-    "test": "cd ../tests && npm run test",
-    "prepublishOnly": "npm run build && cd ../tests && npm run test && cd ../library && node --eval \"require('fs').copyFile('../README.md', 'README.md', error => {if(error) throw error})\"",
-    "postpublish": "node --eval \"require('fs').unlink('README.md', error => {if(error) throw error})\""
+    "test": "cd ../tests && npm run test"
   },
   "repository": {
     "type": "git",
