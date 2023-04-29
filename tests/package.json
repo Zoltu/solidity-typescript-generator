@@ -15,7 +15,7 @@
     "bn.js": "5.2.0",
     "chai": "4.3.4",
     "chai-as-promised": "7.1.1",
-    "mocha": "8.3.2",
+    "mocha": "10.2.0",
     "@zoltu/solidity-typescript-generator": "file:../library",
     "ts-node": "9.1.1",
     "typescript": "4.2.3"
